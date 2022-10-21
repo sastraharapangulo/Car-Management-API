@@ -46,37 +46,72 @@
   encryptPassword,
    //FUNCTION UNTUK REGISTER
    async register(req, res) {
-     const email = req.body.email;
-     const role = "member"
-     const encryptedPassword = await encryptPassword(req.body.password);
-     const user = await UserServices.create({ email, encryptedPassword, role});
-     res.status(201).json({
-       id: user.id,
-       email: user.email,
-       role: user.role,
-       createdAt: user.createdAt,
-       updatedAt: user.updatedAt,
-     });
+    try {
+      if(!req.body.email || !req.body.password){
+        res.status(327).json({
+          status: "FAIL",
+          message: "check missing fields from requestBody",
+        });
+       }
+       const email = req.body.email;
+       const role = "member"
+       const encryptedPassword = await encryptPassword(req.body.password);
+       const user = await UserServices.create({ email, encryptedPassword, role});
+       res.status(201).json({
+        status: "SUCCESS",
+        message: "create user successfully",
+        data: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }
+       });
+    } catch (error) {
+      res.status(422).json({
+        status: "FAIL",
+        message: error.message,
+      });
+    }
    },
 
    //FUNCTION UNTUK MEMBUAT ADMIN
    async createAdmin(req, res) {
-    const email = req.body.email;
-    const role = "admin"
-    const encryptedPassword = await encryptPassword(req.body.password);
-    const user = await UserServices.create({ email, encryptedPassword, role});
-    res.status(201).json({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    });
+    try {
+      if(!req.body.email || !req.body.password){
+        res.status(327).json({
+          status: "FAIL",
+          message: "check missing fields from requestBody",
+        });
+       }
+       const email = req.body.email;
+       const role = "admin"
+       const encryptedPassword = await encryptPassword(req.body.password);
+       const user = await UserServices.create({ email, encryptedPassword, role});
+       res.status(201).json({
+        status: "SUCCESS",
+        message: "create admin successfully",
+        data: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }
+       });
+    } catch (error) {
+      res.status(422).json({
+        status: "FAIL",
+        message: error.message,
+      });
+    }
   },
  
    //FUNCTION LOGIN
    async login(req, res) {
-     const email = req.body.email.toLowerCase(); // Biar case insensitive
+    try {
+      const email = req.body.email.toLowerCase(); // Biar case insensitive
      const password = req.body.password;
  
      const user = await UserServices.findOne({
@@ -96,7 +131,7 @@
      );
      //PENGECEKAN JIKA PASSWORD SALAH
      if (!isPasswordCorrect) {
-       res.status(401).json({ message: "Password salah!" });
+       res.status(405).json({ message: "Password salah!" });
        return;
      }
  
@@ -112,12 +147,23 @@
  
      //RESPON YANG DI TAMPILKAN KE CLIENT
      res.status(201).json({
-       id: user.id,
-       email: user.email,
-       token,
-       createdAt: user.createdAt,
-       updatedAt: user.updatedAt,
+      status: "SUCCESS",
+      message: "Login successfully",
+      data:{
+        id: user.id,
+        email: user.email,
+        token,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }
      });
+    } catch (error) {
+      res.status(422).json({
+        status: "FAIL",
+        message: error.message,
+      });
+    }
+     
    },
  
    //FUNCTION UNTUK MENGETAHUI SIAPA YANG SEDANG MENGAKSES DATA
@@ -141,7 +187,8 @@
      } catch (err) {
        console.error(err);
        res.status(401).json({
-         message: "Unauthorized",
+        status: "FAIL",
+        message: "UNAUTHORIZED",
        });
      }
    },

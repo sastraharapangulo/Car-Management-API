@@ -19,7 +19,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GetCars"
-        "400":
+        "422":
           $ref: "#/components/responses/ErrorResponse"
 
     post:
@@ -39,6 +39,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "#/components/responses/ForbiddenResponse"
+        "422":
+          $ref: "#/components/responses/ErrorResponse"
 
   /api/v1/cars/{id}:
     put:
@@ -66,6 +68,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "#/components/responses/ForbiddenResponse"
+        "422":
+          $ref: "#/components/responses/ErrorResponse"
 
     delete:
       security:
@@ -90,6 +94,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "#/components/responses/ForbiddenResponse"
+        "422":
+          $ref: "#/components/responses/ErrorResponse"
 
     get:
       summary: Get Car By ID
@@ -108,7 +114,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GetCarsById"
-        "400":
+        "422":
           $ref: "#/components/responses/ErrorResponse"
 
   /register:
@@ -123,9 +129,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/RegisterResponse"
-        "400":
+        "422":
           $ref: "#/components/responses/ErrorResponse"
-        "403":
+        "327":
           $ref: "#/components/responses/UnprocessableRespon"
 
   /createAdmin:
@@ -146,8 +152,10 @@ paths:
           $ref: "#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "#/components/responses/ForbiddenResponse"
-        "400":
+        "327":
           $ref: "#/components/responses/UnprocessableRespon"
+        "422":
+          $ref: "#/components/responses/ErrorResponse"
 
   /login:
     post:
@@ -160,10 +168,10 @@ paths:
         $ref: "#/components/requestBodies/AdminRequest"
       responses:
         "200":
-          $ref: "#/components/responses/AdminResponse"
+          $ref: "#/components/responses/LoginResponse"
         "401":
           $ref: "#/components/responses/UnauthorizedResponse"
-        "403":
+        "327":
           $ref: "#/components/responses/UnprocessableRespon"
 
   /whoami:
@@ -180,8 +188,6 @@ paths:
           $ref: "#/components/responses/WhoAmIRespon"
         "401":
           $ref: "#/components/responses/UnauthorizedResponse"
-        "403":
-          $ref: "#/components/responses/UnprocessableRespon"
 
 components:
   securitySchemes:
@@ -288,16 +294,17 @@ components:
               status:
                 type: string
                 example: SUCCESS
-              datas:
+              data:
                 type: object
                 properties:
-                  name:
-                    type: string
-                    example: "SUCCESS"
-                  message:
-                    type: string
-                  data:
+                  cars:
                     $ref: "#/components/schemas/Cars"
+              meta:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 1
 
     PostResponse:
       description: create data car success
@@ -308,16 +315,14 @@ components:
             properties:
               status:
                 type: string
-                example: SUCCESS
-              datas:
+                example: "SUCCESS"
+              message:
+                type: string
+                example: "Create Car successfully"
+              data:
                 type: object
                 properties:
-                  name:
-                    type: string
-                    example: "SUCCESS"
-                  message:
-                    type: string
-                  data:
+                  car:
                     $ref: "#/components/schemas/Cars"
 
     PutResponse:
@@ -329,17 +334,10 @@ components:
             properties:
               status:
                 type: string
-                example: SUCCESS
-              datas:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "SUCCESS"
-                  message:
-                    type: string
-                  data:
-                    $ref: "#/components/schemas/Cars"
+                example: "SUCCESS"
+              message:
+                type: string
+                example: "Update Car successfully"
 
     DeleteResponse:
       description: Delete data car success
@@ -349,6 +347,9 @@ components:
             type: object
             properties:
               status:
+                type: string
+                example: "SUCCESS"
+              message:
                 type: string
                 example: Delete Car successfully By superadmin@gmail.com
 
@@ -361,16 +362,11 @@ components:
             properties:
               status:
                 type: string
-                example: SUCCESS
-              datas:
+                example: "SUCCESS"
+              data:
                 type: object
                 properties:
-                  name:
-                    type: string
-                    example: "SUCCESS"
-                  message:
-                    type: string
-                  data:
+                  car:
                     $ref: "#/components/schemas/Cars"
 
     ErrorResponse:
@@ -382,7 +378,10 @@ components:
             properties:
               status:
                 type: string
-                example: Error
+                example: "FAIL"
+              message:
+                type: string
+                example: "ERROR"
 
     UnauthorizedResponse:
       description: Response when accessing protected endpoint without access
@@ -394,15 +393,9 @@ components:
               status:
                 type: string
                 example: FAIL
-              data:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "UNAUTHORIZED"
-                  message:
-                    type: string
-                    example: "Access is not granted"
+              message:
+                type: string
+                example: "UNAUTHORIZED"
 
     ForbiddenResponse:
       description: Response when accessing protected endpoint with access but sufficient access
@@ -414,15 +407,9 @@ components:
               status:
                 type: string
                 example: FAIL
-              data:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "FORBIDDEN"
-                  message:
-                    type: string
-                    example: "Invalid access level"
+              message:
+                type: string
+                example: "you don't have permission"
 
     RegisterResponse:
       description: Created Member
@@ -434,15 +421,27 @@ components:
               status:
                 type: string
                 example: success
+              message:
+                type: string
+                example: "create user successfully"
               data:
                 type: object
                 properties:
-                  name:
+                  id:
+                    type: integer
+                    example: "1"
+                  email:
                     type: string
-                    example: "Success"
-                  message:
+                    example: "member@gmai.com"
+                  role:
                     type: string
-                    example: "create user successfully"
+                    example: "member"
+                  createAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
+                  updateAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
 
     AdminResponse:
       description: Created Admin
@@ -454,15 +453,27 @@ components:
               status:
                 type: string
                 example: success
+              message:
+                type: string
+                example: "create Admin successfully"
               data:
                 type: object
                 properties:
-                  name:
+                  id:
+                    type: integer
+                    example: "1"
+                  email:
                     type: string
-                    example: "Success"
-                  message:
+                    example: "admin@gmai.com"
+                  role:
                     type: string
-                    example: "create Admin successfully"
+                    example: "admin"
+                  createAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
+                  updateAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
 
     LoginResponse:
       description: Login
@@ -474,15 +485,27 @@ components:
               status:
                 type: string
                 example: success
+              message:
+                type: string
+                example: "Login successfully"
               data:
                 type: object
                 properties:
-                  name:
+                  id:
+                    type: integer
+                    example: "1"
+                  email:
                     type: string
-                    example: "Success"
-                  message:
+                    example: "admin@gmai.com"
+                  token:
                     type: string
-                    example: "login successfully"
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgsImVtYWlsIjoi..."
+                  createAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
+                  updateAt:
+                    type: string
+                    example: "2022-10-21T15:27:36.435Z"
 
     UnprocessableRespon:
       description: Unprocessable Entity, check missing fields from requestBody
@@ -494,15 +517,9 @@ components:
               status:
                 type: string
                 example: FAILED
-              data:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "failed"
-                  message:
-                    type: string
-                    example: "check missing fields from requestBody"
+              message:
+                type: string
+                example: "check missing fields from requestBody"
 
     WhoAmIRespon:
       description: Get User Login
@@ -511,18 +528,24 @@ components:
           schema:
             type: object
             properties:
-              status:
+              id:
+                type: integer
+                example: "1"
+              email:
                 type: string
-                example: Success
-              data:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "success"
-                  message:
-                    type: string
-                    example: "check user login"
+                example: "admin@gmai.com"
+              encryptedPassword:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgsImVtYWlsIjoi..."
+              role:
+                type: string
+                example: "admin"
+              createAt:
+                type: string
+                example: "2022-10-21T15:27:36.435Z"
+              updateAt:
+                type: string
+                example: "2022-10-21T15:27:36.435Z"
 
   schemas:
     Cars:
