@@ -1,0 +1,560 @@
+openapi: 3.0.0
+info:
+  title: Cars Manajement API
+  version: 0.0.1
+servers:
+  - description: Local Server
+    url: http://localhost:8000/
+tags:
+  - name: Cars
+    description: Contain every operation about Cars Resource
+paths:
+  /api/v1/cars:
+    get:
+      summary: Get all Cars
+      operationId: Get all Car
+      description: "Get new car data to database"
+      tags:
+        - Cars
+      responses:
+        "200":
+          $ref: "#/components/responses/GetCars"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+
+    post:
+      security:
+        - bearerAuth: []
+      operationId: createCar
+      summary: Create Data Car
+      description: "Add new car data to database \n\n Allowed roles: superadmin, admin"
+      tags:
+        - Cars
+      requestBody:
+        $ref: "#/components/requestBodies/CarsRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/PostResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+
+  /api/v1/cars/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Update Car By Id
+      operationId: UpdateCar
+      description: "Update new car data to database \n\n Allowed roles: superadmin, admin"
+      tags:
+        - Cars
+      parameters:
+        - in: path
+          name: id
+          description: The id of the Post
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        $ref: "#/components/requestBodies/CarUpdate"
+      responses:
+        "200":
+          $ref: "#/components/responses/PutResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete Car By Id
+      operationId: DeleteCar
+      description: "Delete new car data to database \n\n Allowed roles: superadmin, admin"
+      tags:
+        - Cars
+      parameters:
+        - in: path
+          name: id
+          description: The id of the Post
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+
+    get:
+      summary: Get Car By ID
+      operationId: Get Car By Id
+      description: "Get new car data to database"
+      tags:
+        - Cars
+      parameters:
+        - in: path
+          name: id
+          description: The id of the Post
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          $ref: "#/components/responses/GetCarsById"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /register:
+    post:
+      tags:
+        - auth
+      summary: Register new member
+      description: Register new account with member role
+      operationId: registerMember
+      requestBody:
+        $ref: "#/components/requestBodies/MemberRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/RegisterResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "403":
+          $ref: "#/components/responses/UnprocessableRespon"
+
+  /createAdmin:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - auth
+      summary: Register new Admin
+      description: Register new account with admin role
+      operationId: registerAdmin
+      requestBody:
+        $ref: "#/components/requestBodies/LoginRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "400":
+          $ref: "#/components/responses/UnprocessableRespon"
+
+  /login:
+    post:
+      tags:
+        - auth
+      summary: Login
+      description: Login
+      operationId: Login
+      requestBody:
+        $ref: "#/components/requestBodies/AdminRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/UnprocessableRespon"
+
+  /whoami:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - auth
+      summary: Check Who Am I
+      description: whoami
+      operationId: whoami
+      responses:
+        "200":
+          $ref: "#/components/responses/WhoAmIRespon"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/UnprocessableRespon"
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  requestBodies:
+    CarsRequest:
+      description: Create Car Data
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "BMW"
+              rentPerDay:
+                type: integer
+                example: 200000
+              type:
+                type: string
+                example: "Small"
+              image:
+                type: string
+                example: "bmw.jpg"
+
+    CarUpdate:
+      description: Update Car Data
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "BMW"
+              rentPerDay:
+                type: integer
+                example: 200000
+              type:
+                type: string
+                example: "Small"
+              image:
+                type: string
+                example: "bmw.jpg"
+
+    MemberRequest:
+      description: Create Member Data Required fields [email, password]
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "member@gmai.com"
+              password:
+                type: string
+                example: "inimember"
+
+    AdminRequest:
+      description: Create Admin Data Required fields [email, password]
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "admin@gmai.com"
+              password:
+                type: string
+                example: "iniadmin"
+
+    LoginRequest:
+      description: Login [email, password]
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "admin@gmai.com"
+              password:
+                type: string
+                example: "iniadmin"
+
+  responses:
+    GetCars:
+      description: Get data car success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: SUCCESS
+              datas:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "SUCCESS"
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Cars"
+
+    PostResponse:
+      description: create data car success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: SUCCESS
+              datas:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "SUCCESS"
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Cars"
+
+    PutResponse:
+      description: Update data car success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: SUCCESS
+              datas:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "SUCCESS"
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Cars"
+
+    DeleteResponse:
+      description: Delete data car success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: Delete Car successfully By superadmin@gmail.com
+
+    GetCarsById:
+      description: Get data car success with id = id
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: SUCCESS
+              datas:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "SUCCESS"
+                  message:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Cars"
+
+    ErrorResponse:
+      description: Error Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: Error
+
+    UnauthorizedResponse:
+      description: Response when accessing protected endpoint without access
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: FAIL
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "UNAUTHORIZED"
+                  message:
+                    type: string
+                    example: "Access is not granted"
+
+    ForbiddenResponse:
+      description: Response when accessing protected endpoint with access but sufficient access
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: FAIL
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "FORBIDDEN"
+                  message:
+                    type: string
+                    example: "Invalid access level"
+
+    RegisterResponse:
+      description: Created Member
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Success"
+                  message:
+                    type: string
+                    example: "create user successfully"
+
+    AdminResponse:
+      description: Created Admin
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Success"
+                  message:
+                    type: string
+                    example: "create Admin successfully"
+
+    LoginResponse:
+      description: Login
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "Success"
+                  message:
+                    type: string
+                    example: "login successfully"
+
+    UnprocessableRespon:
+      description: Unprocessable Entity, check missing fields from requestBody
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: FAILED
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "failed"
+                  message:
+                    type: string
+                    example: "check missing fields from requestBody"
+
+    WhoAmIRespon:
+      description: Get User Login
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: Success
+              data:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "check user login"
+
+  schemas:
+    Cars:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: BMW
+        rentPerDay:
+          type: integer
+          example: 200000
+        type:
+          type: string
+          example: Small
+        image:
+          type: string
+          example: mobil.jpg
+        createBy:
+          type: string
+          example: user@example.com
+        updateBy:
+          type: string
+          example: user@example.com
+        deleteBy:
+          type: string
+          example: user@example.com
+        createdAt:
+          type: string
+          example: "2021-07-30 17:00:00 +0700"
+        updatedAt:
+          type: string
+          example: "2021-07-30 17:00:00 +0700"
